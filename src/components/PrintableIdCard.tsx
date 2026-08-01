@@ -68,11 +68,6 @@ const cornerMarkBase: React.CSSProperties = {
 export function IdCardVisual({ student }: { student: StudentRecord }) {
   const photo = studentPhoto(student);
   const dob = formatDate(student.dateOfBirth);
-  // Unique per card instance — when many cards render on one printed page
-  // (Print All IDs), duplicate SVG gradient ids only resolve for the first
-  // card and the rest silently fail to paint their watermark.
-  const goldGradientId = `blobGold-${student.id}`;
-  const tealGradientId = `blobTeal-${student.id}`;
 
   return (
     <div
@@ -82,7 +77,16 @@ export function IdCardVisual({ student }: { student: StudentRecord }) {
         borderRadius: 16,
         overflow: 'hidden',
         fontFamily: "'Manrope', sans-serif",
+        // FIX: the gold/teal watermark blobs used to be SVG <radialGradient>
+        // paint servers (see git history). Chromium's print rasterizer only
+        // reliably paints a small number of unique SVG gradients per print
+        // job — on an 8-up sheet (16 gradients total) everything past the
+        // 4th card silently rendered with no watermark at all. Plain CSS
+        // radial-gradient() backgrounds don't hit that limit, so they're
+        // used here instead — same look, no per-page cap.
         background:
+          'radial-gradient(300px 220px at 85% 11%, rgba(228,201,138,0.5) 0%, rgba(228,201,138,0) 70%),' +
+          'radial-gradient(340px 290px at 3% 83%, rgba(63,138,121,0.5) 0%, rgba(63,138,121,0) 70%),' +
           'radial-gradient(240px 150px at 88% -10%, #fdf9ef 0%, transparent 60%),' +
           'radial-gradient(210px 140px at -8% 108%, #f3ead1 0%, transparent 55%),' +
           'linear-gradient(155deg, #fbf7ec 0%, #f6efdd 55%, #f1e8d1 100%)',
@@ -90,23 +94,12 @@ export function IdCardVisual({ student }: { student: StudentRecord }) {
         boxShadow: '0 0 0 1px #E2EFF9',
       }}
     >
-      {/* Decorative watermark / guilloché pattern */}
+      {/* Decorative watermark / guilloché pattern — monogram + ring lines only;
+          the gold/teal blobs live in the CSS background above now. */}
       <svg
         viewBox="0 0 324 204"
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
       >
-        <defs>
-          <radialGradient id={goldGradientId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#e4c98a" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#e4c98a" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id={tealGradientId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#3f8a79" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#3f8a79" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <ellipse cx="277" cy="22" rx="94" ry="80" fill={`url(#${goldGradientId})`} />
-        <ellipse cx="11" cy="170" rx="120" ry="105" fill={`url(#${tealGradientId})`} />
         <text x="230" y="156" fontFamily="Fraunces, serif" fontWeight={600} fontSize={122} fill={INK} opacity={0.035} textAnchor="middle">
           {schoolMonogram(SCHOOL_NAME)}
         </text>
