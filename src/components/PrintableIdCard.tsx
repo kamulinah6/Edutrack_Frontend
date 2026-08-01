@@ -150,7 +150,7 @@ export function IdCardVisual({ student, decorated = true }: { student: StudentRe
         </div>
 
         {/* Body */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 9, paddingTop: 5 }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, paddingTop: 5 }}>
           {/* Portrait */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div style={{
@@ -212,7 +212,7 @@ export function IdCardVisual({ student, decorated = true }: { student: StudentRe
           {/* QR */}
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
             <div style={{
-              width: 46, height: 46, background: CARD_BG, border: `1px solid ${LINE}`,
+              width: 58, height: 58, background: CARD_BG, border: `1px solid ${LINE}`,
               borderRadius: 6, padding: 3, display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               {student.qrImageBase64 ? (
