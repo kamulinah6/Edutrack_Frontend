@@ -68,6 +68,11 @@ const cornerMarkBase: React.CSSProperties = {
 export function IdCardVisual({ student }: { student: StudentRecord }) {
   const photo = studentPhoto(student);
   const dob = formatDate(student.dateOfBirth);
+  // Unique per card instance — when many cards render on one printed page
+  // (Print All IDs), duplicate SVG gradient ids only resolve for the first
+  // card and the rest silently fail to paint their watermark.
+  const goldGradientId = `blobGold-${student.id}`;
+  const tealGradientId = `blobTeal-${student.id}`;
 
   return (
     <div
@@ -91,17 +96,17 @@ export function IdCardVisual({ student }: { student: StudentRecord }) {
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
       >
         <defs>
-          <radialGradient id="blobGold" cx="50%" cy="50%" r="50%">
+          <radialGradient id={goldGradientId} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#e4c98a" stopOpacity="0.5" />
             <stop offset="100%" stopColor="#e4c98a" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="blobTeal" cx="50%" cy="50%" r="50%">
+          <radialGradient id={tealGradientId} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#3f8a79" stopOpacity="0.5" />
             <stop offset="100%" stopColor="#3f8a79" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <ellipse cx="277" cy="22" rx="94" ry="80" fill="url(#blobGold)" />
-        <ellipse cx="11" cy="170" rx="120" ry="105" fill="url(#blobTeal)" />
+        <ellipse cx="277" cy="22" rx="94" ry="80" fill={`url(#${goldGradientId})`} />
+        <ellipse cx="11" cy="170" rx="120" ry="105" fill={`url(#${tealGradientId})`} />
         <text x="230" y="156" fontFamily="Fraunces, serif" fontWeight={600} fontSize={122} fill={INK} opacity={0.035} textAnchor="middle">
           {schoolMonogram(SCHOOL_NAME)}
         </text>
