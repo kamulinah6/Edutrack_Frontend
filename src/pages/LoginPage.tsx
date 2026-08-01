@@ -9,18 +9,23 @@ const ROLES: { key: Role; label: string; emoji: string; desc: string; color: str
   { key: 'scanner',   label: 'Gate Operator',emoji: '📱', desc: 'Scan QR codes',        color: '#2E7D32', bg: '#E8F5E9', email: 'scanner@school.edu'   },
 ];
 
-export default function LoginPage({ onLogin, onBack }: {
+export default function LoginPage({ onLogin, onBack, hideBack, restrictRole, externalError }: {
   onLogin: (role: Role, fullName: string) => void;
   onBack: () => void;
+  hideBack?: boolean;
+  restrictRole?: Role;
+  externalError?: string;
 }) {
-  const [selectedRole, setSelectedRole] = useState<Role>('principal');
-  const [email, setEmail]       = useState('principal@school.edu');
+  const availableRoles = restrictRole ? ROLES.filter(r => r.key === restrictRole) : ROLES;
+  const [selectedRole, setSelectedRole] = useState<Role>(restrictRole ?? 'principal');
+  const [email, setEmail]       = useState(availableRoles[0].email);
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
   const [showPass, setShowPass] = useState(false);
 
-  const selected = ROLES.find(r => r.key === selectedRole)!;
+  const selected = availableRoles.find(r => r.key === selectedRole)!;
+  const displayError = error || externalError;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,13 +63,15 @@ export default function LoginPage({ onLogin, onBack }: {
       ))}
 
       {/* Back button */}
-      <button onClick={onBack} style={{
-        position: 'fixed', top: 16, left: 16,
-        background: 'white', border: '1.5px solid #E2EFF9', borderRadius: 12,
-        padding: '8px 14px', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-        color: '#475569', display: 'flex', alignItems: 'center', gap: 6,
-        boxShadow: '0 2px 10px rgba(0,0,0,0.06)', zIndex: 10,
-      }}>← Back</button>
+      {!hideBack && (
+        <button onClick={onBack} style={{
+          position: 'fixed', top: 16, left: 16,
+          background: 'white', border: '1.5px solid #E2EFF9', borderRadius: 12,
+          padding: '8px 14px', cursor: 'pointer', fontSize: 13, fontWeight: 700,
+          color: '#475569', display: 'flex', alignItems: 'center', gap: 6,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.06)', zIndex: 10,
+        }}>← Back</button>
+      )}
 
       {/* Card */}
       <div style={{
@@ -82,8 +89,8 @@ export default function LoginPage({ onLogin, onBack }: {
         {/* Role selector */}
         <div style={{ marginBottom: 24 }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Who are you?</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-            {ROLES.map(r => (
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${availableRoles.length},1fr)`, gap: 10 }}>
+            {availableRoles.map(r => (
               <button
                 key={r.key}
                 onClick={() => { setSelectedRole(r.key); setEmail(r.email); setError(''); }}
@@ -148,13 +155,13 @@ export default function LoginPage({ onLogin, onBack }: {
           </div>
 
           {/* Error */}
-          {error && (
+          {displayError && (
             <div style={{
               background: '#FFF1F2', border: '1.5px solid #FDA4AF', borderRadius: 12,
               padding: '10px 14px', fontSize: 13, color: '#BE123C', fontWeight: 600,
               marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8,
             }}>
-              <span style={{ fontSize: 16 }}>⚠️</span> {error}
+              <span style={{ fontSize: 16 }}>⚠️</span> {displayError}
             </div>
           )}
 
