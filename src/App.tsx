@@ -14,6 +14,14 @@ import { clearToken } from './api';
 type Role = 'admin' | 'principal' | 'scanner';
 type Page = 'dashboard' | 'students' | 'analytics' | 'scanner' | 'notifications' | 'studentprofile' | 'holidays';
 
+// ── Gate Mode ──────────────────────────────────────────────────────────
+// A stripped-down build of this same site for the dedicated "EduTrack Gate
+// Scanner" mobile app. Triggered purely by a URL flag, so one deployment
+// serves both the full admin dashboard (edutrack.eu.co) and the gate-only
+// experience (edutrack.eu.co/?gate=1) — point Median's App Studio at the
+// `?gate=1` URL when building the scanner app. No separate hosting needed.
+const IS_GATE_MODE = new URLSearchParams(window.location.search).get('gate') === '1';
+
 const NAV_ITEMS: { page: Page; icon: string; label: string; roles: Role[]; badge?: number }[] = [
   { page: 'dashboard',     icon: '📊', label: 'Dashboard',       roles: ['admin', 'principal'] },
   { page: 'scanner',       icon: '📱', label: 'QR Scanner',      roles: ['admin', 'scanner'] },
@@ -47,11 +55,12 @@ function initials(name: string, role: Role) {
 }
 
 export default function App() {
-  const [view,     setView]     = useState<'landing' | 'login' | 'app'>('landing');
+  const [view,     setView]     = useState<'landing' | 'login' | 'app'>(IS_GATE_MODE ? 'login' : 'landing');
   const [role,     setRole]     = useState<Role>('admin');
   const [fullName, setFullName] = useState('');
   const [page,     setPage]     = useState<Page>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [gateError, setGateError] = useState('');
 
   // Close sidebar on route change (mobile)
   useEffect(() => { setSidebarOpen(false); }, [page]);
@@ -65,14 +74,61 @@ export default function App() {
   }, [sidebarOpen]);
 
   const handleLogin = (r: Role, name: string) => {
+    if (IS_GATE_MODE && r !== 'scanner') {
+      // This build is locked to Gate Operator accounts only — a real
+      // admin/principal login still succeeds against the API (so we must
+      // check the *server's* role, not just the tile the user tapped),
+      // but it has no business being usable from the gate device.
+      clearToken();
+      setGateError('This app is for Gate Scanner accounts only. Sign in on the EduTrack web dashboard for Admin or Principal access.');
+      return;
+    }
+    setGateError('');
     setRole(r); setFullName(name);
     setPage(r === 'scanner' ? 'scanner' : 'dashboard');
     setView('app');
   };
-  const handleLogout = () => { clearToken(); setView('landing'); setFullName(''); };
+  const handleLogout = () => {
+    clearToken();
+    setFullName('');
+    setView(IS_GATE_MODE ? 'login' : 'landing');
+  };
 
   if (view === 'landing') return <LandingPage onEnterApp={() => setView('login')} />;
-  if (view === 'login')   return <LoginPage onLogin={handleLogin} onBack={() => setView('landing')} />;
+  if (view === 'login') {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onBack={() => setView('landing')}
+        hideBack={IS_GATE_MODE}
+        restrictRole={IS_GATE_MODE ? 'scanner' : undefined}
+        externalError={gateError}
+      />
+    );
+  }
+
+  // ── Gate Mode: full-screen scanner only — no sidebar, no bottom nav,
+  // no search bar, no other pages. This is what Median wraps as the app. ──
+  if (IS_GATE_MODE) {
+    return (
+      <div className="app-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <header className="topbar" style={{ flex: '0 0 auto' }}>
+          <div className="topbar-left">
+            <div className="topbar-titles">
+              <h1>🏫 EduTrack Gate</h1>
+              <p className="topbar-subtitle">{fullName || 'Gate Operator'}</p>
+            </div>
+          </div>
+          <div className="topbar-right">
+            <button className="topbar-btn" onClick={handleLogout} title="Sign out">🚪 Sign Out</button>
+          </div>
+        </header>
+        <div className="page-scroll" style={{ flex: '1 1 auto', overflow: 'auto' }}>
+          <QRScanner />
+        </div>
+      </div>
+    );
+  }
 
   const visibleNav = NAV_ITEMS.filter(n => n.roles.includes(role));
   const { title, subtitle } = PAGE_TITLES[page];
