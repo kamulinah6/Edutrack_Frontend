@@ -534,13 +534,13 @@ export default function Students() {
       {/* ── QR Code Modal ──────────────────────────────────────────────────────── */}
       {qrModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'white', borderRadius: 24, padding: 40, textAlign: 'center', maxWidth: 360, width: '100%', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'white', borderRadius: 24, padding: 40, textAlign: 'center', maxWidth: 440, width: '100%', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
             <h2 style={{ marginBottom: 4 }}>{qrModal.fullName}</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>Class {qrModal.grade} · {qrModal.studentId}</p>
             {qrModal.qrImageBase64 ? (
-              <img src={`data:image/png;base64,${qrModal.qrImageBase64}`} alt="QR Code" style={{ width: 220, height: 220, borderRadius: 16, border: '2px solid var(--border)' }} />
+              <img src={`data:image/png;base64,${qrModal.qrImageBase64}`} alt="QR Code" style={{ width: 320, height: 320, borderRadius: 16, border: '2px solid var(--border)' }} />
             ) : (
-              <div style={{ width: 220, height: 220, background: 'var(--bg)', borderRadius: 16, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 13, color: 'var(--text-muted)' }}>
+              <div style={{ width: 320, height: 320, background: 'var(--bg)', borderRadius: 16, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 13, color: 'var(--text-muted)' }}>
                 No QR image
               </div>
             )}
