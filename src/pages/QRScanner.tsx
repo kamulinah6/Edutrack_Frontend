@@ -415,6 +415,33 @@ function CameraScanner({ scanning, feedback, onScan }: CameraScannerProps) {
 
   const startCamera = useCallback(async () => {
     setCameraError('');
+
+    // ── Median app path ──────────────────────────────────────────────
+    // Inside the Median-wrapped app, use its native QR/Barcode Scanner
+    // plugin (median.barcode.scan()) instead of the browser's
+    // BarcodeDetector API below. BarcodeDetector has little to no support
+    // inside native Android WebView / iOS WKWebView — it's a Chrome/Edge
+    // desktop-and-mobile-browser feature — so without this branch, camera
+    // permission would be granted fine but no QR code would ever actually
+    // get detected inside the app. This only runs when `window.median`
+    // exists (i.e. never on the normal edutrack.eu.cc website), so the
+    // browser behavior below is completely unaffected.
+    const median = (window as any).median;
+    if (median?.barcode?.scan) {
+      try {
+        const result = await median.barcode.scan();
+        if (result?.success && result.code) {
+          const token = result.code.includes('/scan/') ? result.code.split('/scan/').pop()! : result.code;
+          onScan(token);
+        }
+        // user cancelled the native scanner — nothing to do
+      } catch {
+        setCameraError('Could not open the scanner. Use Manual Entry below.');
+      }
+      return;
+    }
+
+    // ── Browser path (edutrack.eu.cc opened directly, unchanged) ─────
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
