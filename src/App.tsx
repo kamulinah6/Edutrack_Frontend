@@ -120,7 +120,20 @@ export default function App() {
             </div>
           </div>
           <div className="topbar-right">
-            <button className="topbar-btn" onClick={handleLogout} title="Sign out">🚪 Sign Out</button>
+            <button
+              onClick={handleLogout}
+              title="Sign out"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                whiteSpace: 'nowrap', flexShrink: 0,
+                padding: '8px 14px', borderRadius: 10,
+                border: '1.5px solid var(--sky-light, #E2EFF9)',
+                background: '#fff', color: 'var(--ink, #132340)',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              🚪 Sign Out
+            </button>
           </div>
         </header>
         <div className="page-scroll" style={{ flex: '1 1 auto', overflow: 'auto' }}>
