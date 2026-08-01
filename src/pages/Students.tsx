@@ -210,6 +210,7 @@ export default function Students() {
 
       await apiUpdateStudent(editModal.id, {
         ...editForm,
+        studentId: editModal.studentId, // backend validates the full entity on update and requires this
         dateOfBirth: editForm.dateOfBirth || undefined,
         ...(photoUrl ? { photoUrl } : {}),
       });
