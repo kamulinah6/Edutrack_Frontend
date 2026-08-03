@@ -377,11 +377,6 @@ export default function Students() {
               <div className="form-group" style={{ marginBottom: 20 }}>
                 <label style={{ display: 'block', marginBottom: 8, fontWeight: 700, fontFamily: 'Nunito', fontSize: 13 }}>
                   Student Photo
-                  {isCloudinaryConfigured ? (
-                    <span style={{ marginLeft: 8, fontSize: 10, color: '#15803D', fontWeight: 600, background: '#DCFCE7', padding: '2px 8px', borderRadius: 20 }}>☁️ Cloudinary CDN</span>
-                  ) : (
-                    <span style={{ marginLeft: 8, fontSize: 10, color: '#C62828', fontWeight: 600, background: '#FFEBEE', padding: '2px 8px', borderRadius: 20 }}>⚠️ CDN not configured</span>
-                  )}
                 </label>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -404,7 +399,7 @@ export default function Students() {
                     )}
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
                       {isCloudinaryConfigured
-                        ? 'Photo will be uploaded to Cloudinary CDN · JPG, PNG or WEBP'
+                        ? 'JPG, PNG or WEBP'
                         : 'Add REACT_APP_CLOUDINARY_CLOUD_NAME & REACT_APP_CLOUDINARY_UPLOAD_PRESET to Vercel env'}
                     </p>
                   </div>
@@ -464,11 +459,6 @@ export default function Students() {
               <div className="form-group" style={{ marginBottom: 20 }}>
                 <label style={{ display: 'block', marginBottom: 8, fontWeight: 700, fontFamily: 'Nunito', fontSize: 13 }}>
                   Student Photo
-                  {isCloudinaryConfigured ? (
-                    <span style={{ marginLeft: 8, fontSize: 10, color: '#15803D', fontWeight: 600, background: '#DCFCE7', padding: '2px 8px', borderRadius: 20 }}>☁️ Cloudinary CDN</span>
-                  ) : (
-                    <span style={{ marginLeft: 8, fontSize: 10, color: '#C62828', fontWeight: 600, background: '#FFEBEE', padding: '2px 8px', borderRadius: 20 }}>⚠️ CDN not configured</span>
-                  )}
                 </label>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -534,13 +524,13 @@ export default function Students() {
       {/* ── QR Code Modal ──────────────────────────────────────────────────────── */}
       {qrModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: 'white', borderRadius: 24, padding: 40, textAlign: 'center', maxWidth: 440, width: '100%', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'white', borderRadius: 24, padding: 40, textAlign: 'center', maxWidth: 360, width: '100%', boxShadow: '0 24px 80px rgba(0,0,0,0.25)' }}>
             <h2 style={{ marginBottom: 4 }}>{qrModal.fullName}</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>Class {qrModal.grade} · {qrModal.studentId}</p>
             {qrModal.qrImageBase64 ? (
-              <img src={`data:image/png;base64,${qrModal.qrImageBase64}`} alt="QR Code" style={{ width: 320, height: 320, borderRadius: 16, border: '2px solid var(--border)' }} />
+              <img src={`data:image/png;base64,${qrModal.qrImageBase64}`} alt="QR Code" style={{ width: 220, height: 220, borderRadius: 16, border: '2px solid var(--border)' }} />
             ) : (
-              <div style={{ width: 320, height: 320, background: 'var(--bg)', borderRadius: 16, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 13, color: 'var(--text-muted)' }}>
+              <div style={{ width: 220, height: 220, background: 'var(--bg)', borderRadius: 16, border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 13, color: 'var(--text-muted)' }}>
                 No QR image
               </div>
             )}
